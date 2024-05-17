@@ -47,25 +47,21 @@ resource "aws_s3_bucket_acl" "bucket" {
 
 resource "aws_s3_bucket_policy" "policy" {
   bucket = aws_s3_bucket.bucket.id
-  policy = <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Sid": "PublicReadGetObject",
-            "Effect": "Allow",
-            "Principal": "*",
-            "Action": [
-                "s3:GetObject"
-            ],
-            "Resource": [
-                "arn:aws:s3:::${aws_s3_bucket.bucket.id}/*"
-            ]
-        }
-    ]
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Sid       = "AllowPutObject",
+        Effect    = "Allow",
+        Principal = "*",
+        Action    = "s3:PutObject",
+        Resource  = "${aws_s3_bucket.bucket.arn}/*",
+      },
+    ],
+  })
 }
-EOF
-}
+
 
 resource "aws_s3_object" "webapp" {
   acl          = "public-read"
